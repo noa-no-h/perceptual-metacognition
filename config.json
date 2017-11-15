@@ -1,0 +1,18 @@
+{
+    "cognitive_atlas_task_id": "trm_553ebfc390256",
+    "instructions":"Respond to the stimuli on the screen.",
+    "description":"Expfactory experiment",
+    "url":"https://www.github.com/expfactory-experiments/perceptual-metacognition",
+    "contributors": [
+        "Ian Eisenberg",
+        "Zeynep Enkavi",
+        "Patrick Bissett",
+        "Vanessa Sochat",
+        "Russell Poldrack"
+    ],
+    "exp_id": "perceptual-metacognition",
+    "name": "Perceptual Metacognition",
+    "reference": ["http://www.sciencedirect.com/science/article/pii/S1053810011002303"],
+    "template": "jspsych",
+    "time": 20
+}
