@@ -314,7 +314,8 @@ var afterTrialUpdate = function(data) {
 	curr_data = {}
 	current_trial = current_trial + 1
 	//2 up 1 down staircase
-	if (data.key_press != -1) {
+	contrast = 0.2*Math.random()
+	/*if (data.key_press != -1) {
 		if (correct === false) {
 			contrast += 0.005
 		} else {
@@ -324,7 +325,7 @@ var afterTrialUpdate = function(data) {
 				correct_counter = 0
 			}
 		}
-	}
+	}*/
 }
 
 /* ************************************ */
@@ -336,8 +337,8 @@ var instructTimeThresh = 0 ///in seconds
 var credit_var = true
 
 // task specific variables
-var practice_len = 10
-var exp_len = 300
+var practice_len = 5
+var exp_len = 5
 var contrast = 0.1
 var correct_counter = 0
 var current_trial = 0
@@ -358,6 +359,20 @@ var confidence_response_area_key =
 	'<button class = response_button_key id = Confidence_2>2</button>' +
 	'<button class = response_button_key id = Confidence_3>3</button>' +
 	'<button class = response_button_key id = Confidence_4>4:<br> Very Confident</button>'
+
+var stimulusDifferencePerception =
+	'<p> About which of the previous two trials were you more certain? </p><p>Press 1 for the first. Press 2 for the second</p>' +
+    '<div class = centerbox><div class = fixation>+</div></div><div class = response_div>' +
+	'<button class = response_button id = First_trial>1:<br> Not Confident At All</button>' +
+	'<button class = response_button id = Second_trial>2</button>' 
+
+var stimulusDifferencePerceptionKey =
+    '<div class="centerbox">' + // Ensure text is also centered if desired.
+        '<p class="center-block-text">About which of the previous two trials were you more certain?</p>' +
+        '<p class="center-block-text">Press 1 for the first. Press 2 for the second.</p>' +
+        '<div class="fixation">+</div>' +
+    '</div>';
+
 
 /* ************************************ */
 /* Set up jsPsych blocks */
@@ -401,17 +416,37 @@ var feedback_instruct_block = {
 	timing_response: 180000
 };
 /// This ensures that the subject does not read through the instructions too quickly.  If they do it too quickly, then we will go over the loop again.
+
+
 var instructions_block = {
-	type: 'poldrack-instructions',
-	data: {
-		trial_id: "instruction"
-	},
-	pages: [
-		'<div class = centerbox><p class = block-text>In this experiment, you will see two patches of random noise. In one of the patches there is a slight grating (a striped pattern). Your task is to indicate whether the left or right stimulus has the grating by using the arrow keys. There is a fixation cross in the middle of the screen. The patches come on the screen for a very short amount of time, so keep your eyes on the cross.</p><p class = block-text>After you make your choice you will be asked to rate how confident you are that you were correct, on a scale from 1 to 4. Press the corresponding number key to indicate your confidence. We will begin with practice after you end the instructions.</p></div>'
-	],
-	allow_keys: false,
-	show_clickable_nav: true,
-	timing_post_trial: 1000
+    type: 'poldrack-instructions',
+    data: {
+        trial_id: "instruction"
+    },
+    pages: [
+        // Example new page 1:
+        '<div class = centerbox><p class = block-text>In this experiment, you will see two patches of random noise. ' +
+        'In one of the patches (either left or right) there will be a faint striped pattern (a grating). ' +
+        'Your task is to indicate whether the grating appeared in the <strong>left</strong> or <strong>right</strong> patch using the arrow keys. ' +
+        'Keep your eyes on the fixation cross (+) in the middle of the screen, as the patches appear very briefly.</p>' +
+        '<p class = block-text>You will perform this task for a pair of trials. After each pair, you will be asked a follow-up question.</p></div>',
+
+        // Example new page 2 (describing the difference perception task):
+        '<div class = centerbox><p class = block-text>After each pair of discrimination trials, you will be asked: ' +
+        '<strong>"About which of the previous two trials were you more certain?"</strong></p>' +
+        '<p class = block-text>You will respond by pressing the <strong>\'1\' key</strong> if you were more certain about the first trial in the pair, ' +
+        'or the <strong>\'2\' key</strong> if you were more certain about the second trial in the pair.</p>' +
+        '<p class = block-text>We will begin with some practice trials shortly.</p></div>'
+    ],
+    allow_keys: false,
+    show_clickable_nav: true,
+    timing_post_trial: 1000
+};
+
+// instruction_node remains structurally the same but will use the updated instructions_block
+var instruction_node = {
+    timeline: [feedback_instruct_block, instructions_block],
+    loop_function: function(data) { /* ... your existing loop function ... */ }
 };
 
 var instruction_node = {
@@ -442,7 +477,7 @@ var start_test_block = {
 		trial_id: "end"
 	},
 	timing_response: 180000,
-	text: '<div class = centerbox><p class = center-block-text>We are done with practice. We will now start the test. This will be identical to the practice - your task is to indicate where the grating is by pressing the arrow keys. After you make your choice, rate how confident you are that your response was accurate.</p><p class = center-block-text>Press <strong>enter</strong> to continue.</p></div>',
+	text: '<div class = centerbox><p class = center-block-text>We are done with practice. We will now start the test. This will be identical to the practice - your task is to indicate where the grating is by pressing the arrow keys.</p><p class = center-block-text>Press <strong>enter</strong> to continue.</p></div>',
 	cont_key: [13],
 	timing_post_trial: 0
 };
@@ -508,7 +543,10 @@ var confidence_block = {
 	timing_stim: 4000,
 	timing_response: 4000,
 	response_ends_trial: true,
-	timing_post_trial: 0
+	timing_post_trial: 0,
+    on_finish: function(data) {
+        console.log("data.BUTTONkey_press: " + data.key_press)
+    }
 }
 
 var confidence_key_block = {
@@ -530,6 +568,125 @@ var confidence_key_block = {
 	}
 }
 
+//below are two different response options - either button click or key press
+/*var differencePerception = {
+	type: 'single-stim-button',
+	stimulus: stimulusDifferencePerception,
+	button_class: 'response_button',
+	data: {
+		trial_id: 'difference_rating',
+		exp_stage: 'test'
+	},
+	timing_stim: 4000,
+	timing_response: 4000,
+	response_ends_trial: true,
+	timing_post_trial: 0,
+    on_finish: function(data) {
+        console.log("data.BUTTONkey_press: " + data.key_press)
+    }
+}*/
+
+var differencePerception_key = {
+    type: 'poldrack-single-stim',
+    // Assuming your choices parameter is now something like [49, 50] or ['1', '2']
+    // If data.key_press is giving you keyCodes (like 50), using [49, 50] for choices is clear.
+    choices: [49, 50], // Or ['1', '2'] if that also results in data.key_press being a keyCode
+    stimulus: stimulusDifferencePerceptionKey,
+    data: {
+        trial_id: 'difference_rating',
+        exp_stage: 'test'
+    },
+    is_html: true,
+    timing_stim: 4000,
+    timing_response: 4000,
+    response_ends_trial: true,
+    timing_post_trial: 0,
+    on_finish: function(data) {
+        var keyPressedCode = data.key_press; // This is the keyCode, e.g., 49 for '1', 50 for '2'
+        var participantSemanticResponse;
+
+        // Map the keyCode to your semantic response values (1 or 2)
+        if (keyPressedCode == 49) { // '1' key was pressed
+            participantSemanticResponse = 1;
+        } else if (keyPressedCode == 50) { // '2' key was pressed
+            participantSemanticResponse = 2;
+        } else {
+            // Handle cases where no valid key was pressed or an unexpected keyCode appears
+            participantSemanticResponse = undefined; // Or -1, or however you want to note an invalid/missing response
+        }
+
+        var priorData = jsPsych.data.getData();
+        // Ensure these indices are correct for your full experiment structure.
+        // For [fixation, test, test, difference_perception], length-2 and length-3 are correct.
+        var lastDataEntryContrast = priorData[priorData.length-2]['contrast'];
+        var secondToLastDataEntryContrast = priorData[priorData.length-3]['contrast'];
+
+        var actualMoreDifference = null; // This will be 1 or 2 (semantic)
+        if (lastDataEntryContrast > secondToLastDataEntryContrast) {
+            actualMoreDifference = 2; // Higher contrast in the second trial (T2) -> should choose 2
+        } else {
+            actualMoreDifference = 1; // Higher or equal contrast in the first trial (T1) -> should choose 1
+        }
+        
+        var clickedCorrectDifference = false;
+        if (participantSemanticResponse !== undefined) {
+            clickedCorrectDifference = (participantSemanticResponse == actualMoreDifference);
+        }
+
+        // Updated console logs for clarity
+        console.log("Last Data Contrast (T2): " + lastDataEntryContrast);
+        console.log("Second to Last Data Contrast (T1): " + secondToLastDataEntryContrast);
+        console.log("Actual More Difference (Correct Semantic Choice): " + actualMoreDifference);
+        console.log("Key Pressed Code (from data.key_press): " + keyPressedCode);
+        console.log("Participant's Semantic Response: " + participantSemanticResponse);
+        console.log("Clicked Correct Difference: " + clickedCorrectDifference);
+
+        jsPsych.data.addDataToLastTrial({
+            correctDifferenceConfidence: clickedCorrectDifference,
+            participantSemanticResponse: participantSemanticResponse, // Good to save this
+            actualMoreDifference: actualMoreDifference, // And this for easier checking
+            keyPressedCode: keyPressedCode // And the raw key code
+        });
+    }
+};
+
+//participants evaluate the difference between their control of the previous two tests
+var differencePerception = {
+    type: "html-keyboard-response",
+    stimulus: `
+    <p> About which of the previous two trials were you more certain? </p><p>Press 1 for the first. Press 2 for the second</p>
+        `,
+    choices: ['1', '2'],
+    data: {
+        correct_response: function(){
+            var priorData = jsPsych.data.get().filter({exp_stage: 'test'}).values()
+            // check what this spits out
+            lastDataEntry = priorData[priorData.length-1]
+            secondToLastDataEntry = priorData[priorData.length-2]
+            console.log("lastDataEntry: " + lastDataEntry);
+            console.log("secondToLastDataEntry: " + secondToLastDataEntry);
+            //for (let key in priorData) {
+              //  console.log(key + ": ", priorData[key]);
+            //}
+            
+            if (firstDifference>secondDifference){
+                return '1'
+            }
+            else{
+                return '2'
+                
+            }
+        
+        
+        },
+        test_part: 'perceived_difference'
+    },
+    on_finish: function(data){
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+        console.log("data.correct: " + data.correct)
+    }
+};
+
 /* create experiment definition array */
 var perceptual_metacognition_experiment = [];
 perceptual_metacognition_experiment.push(instruction_node);
@@ -537,17 +694,33 @@ perceptual_metacognition_experiment.push(instruction_node);
 for (var i = 0; i < practice_len; i++) {
 	perceptual_metacognition_experiment.push(fixation_block);
 	perceptual_metacognition_experiment.push(easy_block);
-	perceptual_metacognition_experiment.push(confidence_key_block);
+	perceptual_metacognition_experiment.push(easy_block);
+	perceptual_metacognition_experiment.push(differencePerception_key);
+	// perceptual_metacognition_experiment.push(confidence_key_block);
 }
 perceptual_metacognition_experiment.push(start_test_block)
 for (var i = 0; i < exp_len; i++) {
 	perceptual_metacognition_experiment.push(fixation_block);
 	if (jQuery.inArray(i,catch_trials) !== -1) {
 		perceptual_metacognition_experiment.push(easy_block)
+		perceptual_metacognition_experiment.push(easy_block)
+		perceptual_metacognition_experiment.push(differencePerception_key);
+
 	} else {
 		perceptual_metacognition_experiment.push(test_block);
+		perceptual_metacognition_experiment.push(test_block);
+		perceptual_metacognition_experiment.push(differencePerception_key);
+
 	}
-	perceptual_metacognition_experiment.push(confidence_key_block);
+	//perceptual_metacognition_experiment.push(confidence_key_block);
 }
 perceptual_metacognition_experiment.push(post_task_block)
 perceptual_metacognition_experiment.push(end_block);
+
+console.log(jsPsych.version);
+
+
+
+
+
+//var perceptual_metacognition_experiment = [fixation_block, test_block, test_block]
