@@ -689,6 +689,8 @@ var differencePerception = {
 
 /* create experiment definition array */
 var perceptual_metacognition_experiment = [];
+perceptual_metacognition_experiment.push(pavlovia_init);
+
 perceptual_metacognition_experiment.push(instruction_node);
 
 for (var i = 0; i < practice_len; i++) {
@@ -716,6 +718,7 @@ for (var i = 0; i < exp_len; i++) {
 }
 perceptual_metacognition_experiment.push(post_task_block)
 perceptual_metacognition_experiment.push(end_block);
+perceptual_metacognition_experiment.push(pavlovia_finish);
 
 console.log(jsPsych.version);
 

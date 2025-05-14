@@ -1,75 +1,81 @@
-<!DOCTYPE html><html class=''>
+<!DOCTYPE html>
+<html class=''>
 <head>
     <meta charset='UTF-8'>
     <meta name="robots" content="noindex">
     <title>The Experiment Factory perceptual-metacognition</title>
     
-<link rel='stylesheet' type='text/css' href='jspsych.css'>
-<link rel='stylesheet' type='text/css' href='default_style.css'>
-<link rel='stylesheet' type='text/css' href='style.css'>
+    <link rel='stylesheet' type='text/css' href='jspsych.css'>
+    <link rel='stylesheet' type='text/css' href='default_style.css'>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+
+    <script src='js/jquery.min.js'></script> <script src="js/math.min.js"></script>
+    
+    <script src='js/jspsych/jspsych.js'></script>
+    
+    <script src='js/jspsych/plugins/jspsych-text.js'></script>
+    <script src='js/jspsych/poldrack_plugins/jspsych-poldrack-text.js'></script>
+    <script src='js/jspsych/poldrack_plugins/jspsych-poldrack-instructions.js'></script>
+    <script src='js/jspsych/plugins/jspsych-call-function.js'></script>
+    <script src='js/jspsych/poldrack_plugins/jspsych-attention-check.js'></script>
+    <script src='js/jspsych/poldrack_plugins/jspsych-poldrack-single-stim.js'></script>
+    <script src='js/jspsych/plugins/jspsych-survey-text.js'></script>
+    <script src='js/jspsych/poldrack_plugins/jspsych-single-stim-button.js'></script>
+    <script src='js/jspsych/poldrack_plugins/poldrack_utils.js'></script> <script type="text/javascript" src="lib/jspsych-pavlovia-3.0.0.js"></script>
+
+    <script src='experiment.js'></script>
 </head>
 
 <body>
-<script src='js/jquery.min.js'></script>
-<script src="js/math.min.js"></script>
-<script src='js/jspsych/jspsych.js'></script>
-<script src='js/jspsych/plugins/jspsych-text.js'></script>
-<script src='js/jspsych/poldrack_plugins/jspsych-poldrack-text.js'></script>
-<script src='js/jspsych/poldrack_plugins/jspsych-poldrack-instructions.js'></script>
-<script src='js/jspsych/plugins/jspsych-call-function.js'></script>
-<script src='js/jspsych/poldrack_plugins/jspsych-attention-check.js'></script>
-<script src='js/jspsych/poldrack_plugins/jspsych-poldrack-single-stim.js'></script>
-<script src='js/jspsych/plugins/jspsych-survey-text.js'></script>
-<script src='js/jspsych/poldrack_plugins/jspsych-single-stim-button.js'></script>
-<script src='js/jspsych/poldrack_plugins/poldrack_utils.js'></script>
-<script src='experiment.js'></script>
-
+    </body>
 
 <script>
-$( document ).ready(function() {
+    // This is your main script block for initializing jsPsych
 
-    jsPsych.init({
-             timeline: perceptual_metacognition_experiment,
-             display_element: "getDisplayElement",
-             fullscreen: true,
-             on_trial_finish: function(data){
-               addID('perceptual-metacognition')
-             },
+    // Define Pavlovia blocks (these should be pushed onto your timeline in experiment.js)
+    const pavlovia_init = {
+        type: "pavlovia",
+        command: "init",
+    };
 
-             on_finish: function(data){
+    const pavlovia_finish = {
+        type: "pavlovia",
+        command: "finish",
+        // OPTIONAL: You can add a message to show while data is saving.
+        // message: "Please wait while your data is being saved...", 
+        // OPTIONAL: specify data format if not 'csv' or 'json' (Pavlovia default)
+        // data_format: 'csv', 
+    };
 
-                 // Serialize the data
-                 var promise = new Promise(function(resolve, reject) {
-                     var data = jsPsych.data.dataAsJSON();
-                     resolve(data);
-                 })
+    $(document).ready(function() {
+        // OPTIONAL: Capture URL parameters (e.g., from Prolific)
+        // var subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+        // var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+        // var session_id = jsPsych.data.getURLVariable('SESSION_ID');
 
-                 promise.then(function(data) {
+        // jsPsych.data.addProperties({
+        //     subject_id: subject_id,
+        //     study_id: study_id,
+        //     session_id: session_id
+        // });
 
-
-                     $.ajax({
-                         type: "POST",
-                         url: '/save',
-                         data: { "data": data },
-                         success: function(){ document.location = "/next" },
-                         dataType: "application/json",
-
-                         // Endpoint not running, local save
-                         error: function(err) {
-
-                             if (err.status == 200){
-                                 document.location = "/next";
-                             } else {
-                                 // If error, assue local save
-                                 jsPsych.data.localSave('perceptual-metacognition_results.csv', 'csv');
-                             }
-                         }
-                     });
-                 })
-             }
-
-      });
-});
+        // Initialize jsPsych
+        jsPsych.init({
+            timeline: perceptual_metacognition_experiment, // This is defined in experiment.js
+            // display_element: undefined, // Let jsPsych use the body by default
+            fullscreen: true, // Your existing fullscreen setting
+            on_trial_finish: function(data) {
+                // Your existing on_trial_finish function (addID is from poldrack_utils.js)
+                if (typeof addID === 'function') {
+                    addID('perceptual-metacognition');
+                } else {
+                    console.warn("addID function not found. Ensure poldrack_utils.js is loaded and addID is global.");
+                    // As a fallback, you can add a property directly:
+                    // data.experiment_id = 'perceptual-metacognition'; 
+                }
+            },
+            // REMOVED: The on_finish callback for AJAX/localSave is handled by the pavlovia plugin.
+        });
+    });
 </script>
-</body>
 </html>
