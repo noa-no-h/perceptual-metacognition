@@ -1,6 +1,21 @@
 /* ************************************ */
 /* Define helper functions */
 /* ************************************ */
+
+const pavlovia_init = {
+	type: "pavlovia",
+	command: "init",
+};
+
+const pavlovia_finish = {
+	type: "pavlovia",
+	command: "finish",
+	// OPTIONAL: You can add a message to show while data is saving.
+	// message: "Please wait while your data is being saved...", 
+	// OPTIONAL: specify data format if not 'csv' or 'json' (Pavlovia default)
+	// data_format: 'csv', 
+};
+
 function assessPerformance() {
 	/* Function to calculate the "credit_var", which is a boolean used to
 	credit individual experiments in expfactory. */
