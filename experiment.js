@@ -540,8 +540,8 @@ var confidence_block = {
 		trial_id: 'confidence_rating',
 		exp_stage: 'test'
 	},
-	timing_stim: 4000,
-	timing_response: 4000,
+	//timing_stim: 4000,
+	//timing_response: 4000,
 	response_ends_trial: true,
 	timing_post_trial: 0,
     on_finish: function(data) {
@@ -558,8 +558,8 @@ var confidence_key_block = {
 		exp_stage: 'test'
 	},
 	is_html: true,
-	timing_stim: 4000,
-	timing_response: 4000,
+	//timing_stim: 4000,
+	//timing_response: 4000,
 	response_ends_trial: true,
 	timing_post_trial: 0,
 	on_finish: function(data) {
@@ -597,8 +597,8 @@ var differencePerception_key = {
         exp_stage: 'test'
     },
     is_html: true,
-    timing_stim: 4000,
-    timing_response: 4000,
+    //timing_stim: 4000,
+    //timing_response: 4000,
     response_ends_trial: true,
     timing_post_trial: 0,
     on_finish: function(data) {
