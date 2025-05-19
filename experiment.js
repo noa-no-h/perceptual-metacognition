@@ -2,13 +2,18 @@
 /* Define helper functions */
 /* ************************************ */
 
-const pavlovia_init = {
-	type: "pavlovia",
+var pavlovia_init = {
+	type: "jsPsychPavlovia",
 	command: "init",
-};
+	setPavloviaInfo: function (info) {
+        console.log(info);
+        pavloviaInfo = info;
+      }
+    };
+
 
 const pavlovia_finish = {
-	type: "pavlovia",
+	type: "jsPsychPavlovia",
 	command: "finish",
 	// OPTIONAL: You can add a message to show while data is saving.
 	// message: "Please wait while your data is being saved...", 
