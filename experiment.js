@@ -3,7 +3,7 @@
 /* ************************************ */
 
 var pavlovia_init = {
-	type: "jsPsychPavlovia",
+	type: "pavlovia",
 	command: "init",
 	setPavloviaInfo: function (info) {
         console.log(info);
@@ -13,7 +13,7 @@ var pavlovia_init = {
 
 
 const pavlovia_finish = {
-	type: "jsPsychPavlovia",
+	type: "pavlovia",
 	command: "finish",
 	// OPTIONAL: You can add a message to show while data is saving.
 	// message: "Please wait while your data is being saved...", 
