@@ -599,5 +599,5 @@ var jsPsychPavlovia = (function(jspsych) {
 	};
 
 	return PavloviaPlugin;
-})(jsPsychModule);
+})(jsPsych);
 
