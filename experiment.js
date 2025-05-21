@@ -5,10 +5,7 @@
 var pavlovia_init = {
 	type: "pavlovia",
 	command: "init",
-	setPavloviaInfo: function (info) {
-        console.log(info);
-        pavloviaInfo = info;
-      }
+	
     };
 
 
